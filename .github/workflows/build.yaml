@@ -21,7 +21,8 @@ jobs:
           pacman -S --needed --noconfirm \
             base-devel \
             git \
-            sudo
+            sudo &&echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/builder
+
 
       - name: Build package
         run: |
