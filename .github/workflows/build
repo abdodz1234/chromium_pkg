@@ -1,0 +1,39 @@
+name: Build Chromium
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    container:
+      image: archlinux:latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Update system
+        run: pacman -Syu --noconfirm
+
+      - name: Install build tools
+        run: |
+          pacman -S --needed --noconfirm \
+            base-devel \
+            git \
+            sudo
+
+      - name: Build package
+        run: |
+          useradd -m builder
+          chown -R builder:builder "$GITHUB_WORKSPACE"
+
+          cd "$GITHUB_WORKSPACE"
+
+          sudo -u builder makepkg -sf --noconfirm
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: chromium
+          path: "*.pkg.tar.zst"
